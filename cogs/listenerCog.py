@@ -35,7 +35,7 @@ class listenerCog(commands.Cog):
                             # yessir, we found a channel where we can notify the user!
 
                             message = await channel.send(content="Hello there " + member.mention + "! You have joined a server protected by noDoot, but it doesn't seem like you have DM's enabled, since I've tried sending you one!\n" +
-                                "Please verify your account on this server: <https://discord.gg/9kQ7Mvm>, and then try joining again!\n\n**This message will self destruct in five minutes, and you will be kicked from the server if you haven't verified yourself!**")
+                                "Please verify your account on this server: <https://discord.gg/9kQ7Mvm>, and then try joining again!\n\n**This message will self-destruct in five minutes, and you will be kicked from the server if you haven't verified yourself!**")
                             channel_found = True
                             break
             if channel_found:
@@ -273,6 +273,7 @@ class listenerCog(commands.Cog):
                 # if not, add them to the verified file
                 addUserToVerified(message.author.id)
                 # Send completion message
+                await logger.log("User completed captcha sucessfully! Added to verified users! User: " + message.author.name + "`" + str(message.author.id) + "`", bot, "INFO")
                 await message.channel.send(content="**Captcha completed successfully!**\nYour account is now verified!")
                 # Kick from the noDoot Server
                 await bot.get_guild(int(os.getenv('nDGuild'))).kick(message.author, reason="noDoot - User verified sucessfully!")

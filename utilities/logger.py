@@ -1,6 +1,5 @@
 import os, sys, logging, datetime
 from logging.handlers import TimedRotatingFileHandler
-from discord import Embed
 
 def setup_logger():
     if not os.path.exists("logs"):

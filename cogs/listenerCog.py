@@ -1,4 +1,3 @@
-import asyncio
 import discord
 from discord import File
 from discord.ext import commands

@@ -1,6 +1,6 @@
 import os, discord
 from discord.ext import commands
-from discord import Embed, File
+from discord import File
 from utilities import logger
 try:
     import config

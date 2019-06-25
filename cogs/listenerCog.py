@@ -106,12 +106,13 @@ class listenerCog(commands.Cog):
 
             return imagefile
 
-        if isUserVerified(userid):
-            logger.logDebug("Already verified!", "DEBUG")
-            return
-
         # we check whether the reaction added is from the verification channel
         if payload.channel_id == int(os.getenv('verificationChannel')):
+            # Checking whether the user already is verified
+            if isUserVerified(userid):
+                logger.logDebug("Already verified!", "DEBUG")
+                return
+
             # if yes, send the user the verification message...
             dm_channel = user.dm_channel
             if dm_channel == None:

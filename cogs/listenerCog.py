@@ -1,4 +1,4 @@
-import discord, asyncio
+import discord, asyncio, User
 from discord import File
 from discord.ext import commands
 from utilities import logger
@@ -50,7 +50,7 @@ class listenerCog(commands.Cog):
                 except Exception as e:
                     await logger.log("Failed to delete the verify message in the server: " + member.guild.name, bot, "WARNING")
 
-                if isUserVerified(member.id):
+                if User.isUserVerified(member.id):
                     await logger.log("User has verified themselves, stopping kick: " + member.name + " / " + str(member.id), bot, "INFO")
                     return
 
@@ -83,21 +83,6 @@ class listenerCog(commands.Cog):
                 await logger.log("No channel for user found, sent the DM's to the owner sucessfully! User: " + owner.name, bot, "INFO")
                 return
 
-        def isUserVerified(userID):
-            # We check the verifiedUsers file...
-            try:
-                with open("verifiedUsers.txt", "r") as file:
-                    ids = [line.rstrip('\n') for line in file]
-            except IOError:
-                with open("verifiedUsers.txt", "w") as file:
-                    ids = [line.rstrip('\n') for line in file]
-
-            # and check if the user id is in the file
-            if str(userID) in ids:
-                return True
-            else:
-                return False
-
         # We check if the member is a bot
         if member.bot == True:
             return
@@ -105,13 +90,13 @@ class listenerCog(commands.Cog):
         # if the member joined the main guild, do nothing
         await logger.log("New member tried to join somewhere! Member: " + member.name + " - Guild: " + member.guild.name, bot, "INFO")
         if member.guild.id == int(os.getenv('nDGuild')):
-            if isUserVerified(member.id):
+            if User.isUserVerified(member.id):
                 await logger.log("Already verified user tried to join noDoot: " + member.name + " / " + str(member.id), bot, "DEBUG")
                 await member.kick(reason="noDoot - User already verified!")
             return
 
         # We check if the user is already a verified user
-        if isUserVerified(member.id):
+        if User.isUserVerified(member.id):
             await logger.log("User is verified. Letting them join! User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "INFO")
             return
 
@@ -131,7 +116,7 @@ class listenerCog(commands.Cog):
             return
 
         await dm_channel.send(content="**You are about to be kicked from a server protected from userbots by noDoot..**\n" +
-            "To verify yourself across all servers using noDoot, please join this server to start the verification process: <https://discord.gg/9kQ7Mvm>. " +
+            "To verify yourself across all servers using noDoot, please join this server to start the verification process: <https://discord.gg/9kQ7Mvm>.\n" +
             "If you complete the verification within five minutes, you won't be kicked from the server that you are trying to join!\n\n" +
             "*You are automatically kicked from the verification server upon verification...*")
         await logger.log("Sent the DM's to the user sucessfully! Sleeping for five minutes, then kick if not verified. User: " + member.name, bot, "INFO")
@@ -140,7 +125,7 @@ class listenerCog(commands.Cog):
         await asyncio.sleep(300) # wait five minutes before kicking the user, and deleting the message
 
         # Then we check again to see if the user has become a verified user
-        if isUserVerified(member.id):
+        if User.isUserVerified(member.id):
             await logger.log("User is verified. Stopping the kick! User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "INFO")
             return
 
@@ -159,21 +144,6 @@ class listenerCog(commands.Cog):
         channel = bot.get_channel(payload.channel_id)
         user = channel.guild.get_member(userid)
 
-        def isUserVerified(userID):
-            # We check the verifiedUsers file...
-            try:
-                with open("verifiedUsers.txt", "r") as file:
-                    ids = [line.rstrip('\n') for line in file]
-            except IOError:
-                with open("verifiedUsers.txt", "w") as file:
-                    ids = [line.rstrip('\n') for line in file]
-
-            # and check if the user id is in the file
-            if str(userID) in ids:
-                return True
-            else:
-                return False
-
         def generateCaptcha():
             # First we generate a random string to use
             chars = string.ascii_letters + string.digits
@@ -189,21 +159,31 @@ class listenerCog(commands.Cog):
             captchaimage.create_noise_dots(image, image.getcolors())
 
             # Now to write the file
-            imagefile = "./img/captcha_" + text + ".png"
+            filenumber = 0
+            while True:
+                if os.path.exists("./img/captcha_" + str(filenumber) + ".png"):
+                    filenumber += 1
+                else:
+                    break
+            imagefile = "./img/captcha_" + str(filenumber) + ".png"
             captchaimage.write(text, imagefile)
 
-            return imagefile
+            return imagefile, text
 
         # we check whether the reaction added is from the verification channel
         if payload.channel_id == int(os.getenv('verificationChannel')):
             await logger.log("A reaction has been added in the verification channel! User ID: " + str(user.id), bot, "DEBUG")
-            # Checking whether the user already is verified
-            if isUserVerified(userid):
-                await logger.log("Already verified! User ID: " + str(user.id), bot, "DEBUG")
-                return
 
             if user.bot == True:
                 return
+
+            # Checking whether the user already is verified
+            if User.isUserVerified(userid):
+                await logger.log("Already verified! User ID: " + str(user.id), bot, "DEBUG")
+                return
+
+            # Add the user to the db
+            User.add_user(user.id, user.name + "#" + user.discriminator)
 
             # if yes, send the user the verification message...
             dm_channel = user.dm_channel
@@ -225,13 +205,17 @@ class listenerCog(commands.Cog):
             # generate a captcha
             captcha = generateCaptcha()
 
+            # Put the captcha into the db
+            User.add_captcha(user.id, captcha[1])
+            await logger.log("Added captcha for user: " + str(user.id) + " to the db. Captcha_text: " + captcha[1], bot, "DEBUG")
+
             # send the message
             await logger.log("Verification sent to user: " + str(user.id), bot, "DEBUG")
             await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below!\n\n" +
-                "*If the captcha is not working, remove and add the reaction again, to create a new captcha, or contact HeroGamers#0001 in the noDoot Verification Server!*", file=File(captcha))
+                "*If the captcha is not working, remove and add the reaction again, to create a new captcha, or contact HeroGamers#0001 in the noDoot Verification Server!*", file=File(captcha[0]))
 
             # Delete the captcha from the filesystem
-            os.remove(captcha)
+            os.remove(captcha[0])
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -243,57 +227,28 @@ class listenerCog(commands.Cog):
                 "\n<https://discord.gg/PvFPEfd>")
             await logger.log("Sent feedback message to user: " + message.author.name, bot, "INFO")
 
-        def addUserToVerified(userID):
-                with open("verifiedUsers.txt", "a") as file:
-                    file.write(str(userID) + "\n")
-
-        def isUserVerified(userID):
-            # We check the verifiedUsers file...
-            try:
-                with open("verifiedUsers.txt", "r") as file:
-                    ids = [line.rstrip('\n') for line in file]
-            except IOError:
-                with open("verifiedUsers.txt", "w") as file:
-                    ids = [line.rstrip('\n') for line in file]
-
-            # and check if the user id is in the file
-            if str(userID) in ids:
-                return True
-            else:
-                return False
-
         # return if author is a bot (we're also a bot)
         if message.author.bot:
             return
+
         # check if it's a DM
         if isinstance(message.channel, discord.DMChannel):
             await logger.log("New message in the DM's", bot, "DEBUG")
-            # check if we even sent any captcha
-            captcha_text = ""
-            notFound = True
-            async for oldmessage in message.channel.history(limit=150):
-                if (oldmessage.author == bot.user) and notFound:
-                    if len(oldmessage.attachments) != 0:
-                        for attachment in oldmessage.attachments:
-                            filename = attachment.filename
-                            if "captcha_" in filename:
-                                captcha_text = filename.replace("captcha_", "").replace(".png", "")
-                                notFound = False
-            if notFound:
-                return
+            # check the captcha
+            captcha_text = User.get_captcha(message.author.id)
 
             await logger.log("User: " + message.author.name + " `" + str(message.author.id) + "` - Captcha Text: " + captcha_text + " - Message content: " + message.content, bot, "DEBUG")
 
             # if the message content is equals to that of the message
             if message.content == captcha_text:
                 # If the user is already verified, do nothing
-                if isUserVerified(message.author.id):
+                if User.isUserVerified(message.author.id):
                     await logger.log("User tried to do captcha again, but are already verified! User: " + message.author.name, bot, "DEBUG")
                     return
-                # if not, add them to the verified file
-                addUserToVerified(message.author.id)
+                # if not, add them to the verified db
+                User.verify_user(message.author.id)
                 # Send completion message
-                await logger.log("User completed captcha sucessfully! Added to verified users! User: " + message.author.name + "`" + str(message.author.id) + "`", bot, "INFO")
+                await logger.log("User completed captcha sucessfully! Added to verified users! User: " + message.author.name + " `" + str(message.author.id) + "`", bot, "INFO")
                 await message.channel.send(content="**Captcha completed successfully!**\nYour account is now verified!")
 
                 # Send Hack Week / Development Feedback Message

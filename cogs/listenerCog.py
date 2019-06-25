@@ -35,7 +35,8 @@ class listenerCog(commands.Cog):
                             # yessir, we found a channel where we can notify the user!
 
                             message = await channel.send(content="Hello there " + member.mention + "! You have joined a server protected by noDoot, but it doesn't seem like you have DM's enabled, since I've tried sending you one!\n" +
-                                "Please verify your account on this server: <https://discord.gg/9kQ7Mvm>, and then try joining again!\n\n**This message will self-destruct in five minutes, and you will be kicked from the server if you haven't verified yourself!**")
+                                "Please verify your account on this server: <https://discord.gg/9kQ7Mvm>, and then try joining again!\n\n" +
+                                "**This message will self-destruct in five minutes, and you will be kicked from the server if you haven't verified yourself!**")
                             channel_found = True
                             break
             if channel_found:
@@ -59,7 +60,7 @@ class listenerCog(commands.Cog):
                 except Exception as e:
                     await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "DEBUG")
                     return
-                await logger.log("Kicked a user from joining a guild, not verified. Couldn't send DM. Reminded on the server. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "DEBUG")
+                await logger.log("Kicked a user from joining a guild, not verified. Couldn't send DM. Reminded on the server. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "INFO")
 
                 return
             else:
@@ -79,7 +80,7 @@ class listenerCog(commands.Cog):
                     # if we can't send the DM, the user probably has DM's off
                     await logger.log("Couldn't send DM to owner of server. Owner ID: " + str(owner.id) + " Guild: " + guild.name + " - Error: " + str(e), bot, "WARNING")
                     return
-                await logger.log("Sent the DM's to the owner sucessfully! User: " + owner.name, bot, "DEBUG")
+                await logger.log("No channel for user found, sent the DM's to the owner sucessfully! User: " + owner.name, bot, "INFO")
                 return
 
         def isUserVerified(userID):
@@ -102,7 +103,7 @@ class listenerCog(commands.Cog):
             return
 
         # if the member joined the main guild, do nothing
-        await logger.log("New member tried to join somewhere! Member: " + member.name + " - Guild: " + member.guild.name, bot, "DEBUG")
+        await logger.log("New member tried to join somewhere! Member: " + member.name + " - Guild: " + member.guild.name, bot, "INFO")
         if member.guild.id == int(os.getenv('nDGuild')):
             if isUserVerified(member.id):
                 await logger.log("Already verified user tried to join noDoot: " + member.name + " / " + str(member.id), bot, "DEBUG")
@@ -111,7 +112,7 @@ class listenerCog(commands.Cog):
 
         # We check if the user is already a verified user
         if isUserVerified(member.id):
-            await logger.log("User is verified. Letting them join! User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "DEBUG")
+            await logger.log("User is verified. Letting them join! User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "INFO")
             return
 
         # We will now try to send them a DM, with the verification server linked (as they can't DM the bot without sharing any servers with it)
@@ -125,13 +126,25 @@ class listenerCog(commands.Cog):
             await dm_channel.send(file=File("./img/hellothere.png"))
         except Exception as e:
             # if we can't send the DM, the user probably has DM's off, at which point we would send them a heads-up in the server they're trying to join, and then kick them a minute or so afterwards
-            await logger.log("Couldn't send DM to user that joined. Member ID: " + str(member.id) + " - Error: " + str(e), bot, "WARNING")
+            await logger.log("Couldn't send DM to user that joined. Member ID: " + str(member.id) + " - Error: " + str(e), bot, "INFO")
             await memberNoDMProcedure(member, member.guild)
             return
 
-        await dm_channel.send(content="**You have been kicked from a server protected from userbots by noDoot..**\nTo verify yourself across all servers using noDoot, please join this server to start the verification process: https://discord.gg/9kQ7Mvm\n\n*You are automatically kicked from the verification server after verification...*")
-        await logger.log("Sent the DM's to the user sucessfully! User: " + member.name, bot, "DEBUG")
-        # And then we kick them, for now.
+        await dm_channel.send(content="**You are about to be kicked from a server protected from userbots by noDoot..**\n" +
+            "To verify yourself across all servers using noDoot, please join this server to start the verification process: <https://discord.gg/9kQ7Mvm>. " +
+            "If you complete the verification within five minutes, you won't be kicked from the server that you are trying to join!\n\n" +
+            "*You are automatically kicked from the verification server upon verification...*")
+        await logger.log("Sent the DM's to the user sucessfully! Sleeping for five minutes, then kick if not verified. User: " + member.name, bot, "INFO")
+
+        # sleeps for five minutes
+        await asyncio.sleep(300) # wait five minutes before kicking the user, and deleting the message
+
+        # Then we check again to see if the user has become a verified user
+        if isUserVerified(member.id):
+            await logger.log("User is verified. Stopping the kick! User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "INFO")
+            return
+
+        # Not verified, kicking
         try:
             await member.kick(reason="noDoot - User needs to be verified..")
         except Exception as e:
@@ -214,7 +227,8 @@ class listenerCog(commands.Cog):
 
             # send the message
             await logger.log("Verification sent to user: " + str(user.id), bot, "DEBUG")
-            await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below!\n\n*If the captcha is not working, remove and add the reaction again, to create a new captcha, or contact HeroGamers#0001 in the noDoot Verification Server!*", file=File(captcha))
+            await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below!\n\n" +
+                "*If the captcha is not working, remove and add the reaction again, to create a new captcha, or contact HeroGamers#0001 in the noDoot Verification Server!*", file=File(captcha))
 
             # Delete the captcha from the filesystem
             os.remove(captcha)
@@ -222,6 +236,12 @@ class listenerCog(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         bot = self.bot
+
+        async def sendFeedbackMessage(message):
+            await message.channel.send(content="__**Discord Hack Week Improvement Message**__\nThanks for using the noDoot bot, which I have made as a part of the Discord Hack Week. " +
+                "If you want to leave feedback on the bot, then you can come give feedback on the verification process through Treeland (or just join so you can DM me, HeroGamers#0001)" +
+                "\n<https://discord.gg/PvFPEfd>")
+            await logger.log("Sent feedback message to user: " + message.author.name, bot, "INFO")
 
         def addUserToVerified(userID):
                 with open("verifiedUsers.txt", "a") as file:
@@ -275,6 +295,11 @@ class listenerCog(commands.Cog):
                 # Send completion message
                 await logger.log("User completed captcha sucessfully! Added to verified users! User: " + message.author.name + "`" + str(message.author.id) + "`", bot, "INFO")
                 await message.channel.send(content="**Captcha completed successfully!**\nYour account is now verified!")
+
+                # Send Hack Week / Development Feedback Message
+                # REMOVE OR CHANGE AFTER HACK WEEK IS OVER
+                await sendFeedbackMessage(message)
+
                 # Kick from the noDoot Server
                 await bot.get_guild(int(os.getenv('nDGuild'))).kick(message.author, reason="noDoot - User verified sucessfully!")
                 return

@@ -1,4 +1,4 @@
-import discord
+import discord, asyncio
 from discord import File
 from discord.ext import commands
 from utilities import logger
@@ -12,6 +12,75 @@ class listenerCog(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         bot = self.bot
+
+        # This is the function that we run when a member tries to join a guild, but they don't have DM's enabled...
+        async def memberNoDMProcedure(member, guild):
+            channel_found = False # We want to have a variable that says whether we found a valid channel to remind the user in...
+            # Now to go through the channels
+            for channel in guild.channels:
+                if channel_found == False:
+                    # we don't want categorychannels and voicechannels
+                    if isinstance(channel, discord.CategoryChannel) or isinstance(channel, discord.VoiceChannel):
+                        continue
+                    # and then we check the permissions for the user
+                    user_permissions = channel.permissions_for(member)
+
+                    # and we check if the user can read messages in that channel
+                    if user_permissions.read_messages:
+                        # and now we check if we, the bot, can write in that channel!
+                        bot_member = guild.get_member(bot.user.id)
+                        bot_permissions = channel.permissions_for(bot_member)
+
+                        if bot_permissions.send_messages:
+                            # yessir, we found a channel where we can notify the user!
+
+                            message = await channel.send(content="Hello there " + member.mention + "! You have joined a server protected by noDoot, but it doesn't seem like you have DM's enabled, since I've tried sending you one!\n" +
+                                "Please verify your account on this server: <https://discord.gg/9kQ7Mvm>, and then try joining again!\n\n**This message will self destruct in five minutes, and you will be kicked from the server if you haven't verified yourself!**")
+                            channel_found = True
+                            break
+            if channel_found:
+                # do something
+                await logger.log("A channel has been found, and a message has been sent on the server! Sleeps for five minutes, and then kicks user, if not verified...", bot, "INFO")
+                await asyncio.sleep(300) # wait five minutes before kicking the user, and deleting the message
+
+                # delete the message
+                try:
+                    await message.delete()
+                except Exception as e:
+                    await logger.log("Failed to delete the verify message in the server: " + member.guild.name, bot, "WARNING")
+
+                if isUserVerified(member.id):
+                    await logger.log("User has verified themselves, stopping kick: " + member.name + " / " + str(member.id), bot, "INFO")
+                    return
+
+                # If user hasn't verified themselves, kick the user
+                try:
+                    await member.kick(reason="noDoot - User needs to be verified.. couldn't send DM to user. Reminded on the server")
+                except Exception as e:
+                    await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "DEBUG")
+                    return
+                await logger.log("Kicked a user from joining a guild, not verified. Couldn't send DM. Reminded on the server. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "DEBUG")
+
+                return
+            else:
+                # no channel found, let's notify the owner of the guild...
+                owner = member.guild.owner
+                # We will now try to send them a DM
+                dm_channel = owner.dm_channel
+                if dm_channel == None:
+                    await owner.create_dm()
+                    dm_channel = owner.dm_channel
+
+                # Send message
+                try:
+                    await dm_channel.send(content="Hello there! On your guild (" + guild.name + "), it doesn't seem like there is a channel where both new members can see messages, and where I can write messages!\n" +
+                        "This means that the user: " + member.name + "`" + member.id + "`, that just tried to join your server, hasn't verified their account yet! Please setup a channel where I can write, and new users can read!")
+                except Exception as e:
+                    # if we can't send the DM, the user probably has DM's off
+                    await logger.log("Couldn't send DM to owner of server. Owner ID: " + str(owner.id) + " Guild: " + guild.name + " - Error: " + str(e), bot, "WARNING")
+                    return
+                await logger.log("Sent the DM's to the owner sucessfully! User: " + owner.name, bot, "DEBUG")
+                return
 
         def isUserVerified(userID):
             # We check the verifiedUsers file...
@@ -55,18 +124,13 @@ class listenerCog(commands.Cog):
         try:
             await dm_channel.send(file=File("./img/hellothere.png"))
         except Exception as e:
-            # if we can't send the DM, the user probably has DM's off, at which point we would uhhh, yeah. back to this later
+            # if we can't send the DM, the user probably has DM's off, at which point we would send them a heads-up in the server they're trying to join, and then kick them a minute or so afterwards
             await logger.log("Couldn't send DM to user that joined. Member ID: " + str(member.id) + " - Error: " + str(e), bot, "WARNING")
-            try:
-                await member.kick(reason="noDoot - User needs to be verified.. couldn't send DM to user")
-            except Exception as e:
-                await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "DEBUG")
-                return
-            await logger.log("Kicked a user from joining a guild, not verified. Couldn't send DM. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "DEBUG")
+            await memberNoDMProcedure(member, member.guild)
             return
 
         await dm_channel.send(content="**You have been kicked from a server protected from userbots by noDoot..**\nTo verify yourself across all servers using noDoot, please join this server to start the verification process: https://discord.gg/9kQ7Mvm\n\n*You are automatically kicked from the verification server after verification...*")
-
+        await logger.log("Sent the DM's to the user sucessfully! User: " + member.name, bot, "DEBUG")
         # And then we kick them, for now.
         try:
             await member.kick(reason="noDoot - User needs to be verified..")

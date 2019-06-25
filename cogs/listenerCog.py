@@ -33,14 +33,16 @@ class listenerCog(commands.Cog):
             return
 
         # if the member joined the main guild, do nothing
-        await logger.log("New member joined somewhere! Member: " + member.name + ". Guild: " + member.guild.name, bot, "DEBUG")
+        await logger.log("New member tried to join somewhere! Member: " + member.name + " - Guild: " + member.guild.name, bot, "DEBUG")
         if member.guild.id == int(os.getenv('nDGuild')):
             if isUserVerified(member.id):
+                await logger.log("Already verified user tried to join noDoot: " + member.name + " / " + str(member.id), bot, "DEBUG")
                 await member.kick(reason="noDoot - User already verified!")
             return
 
         # We check if the user is already a verified user
         if isUserVerified(member.id):
+            await logger.log("User is verified. Letting them join! User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "DEBUG")
             return
 
         # We will now try to send them a DM, with the verification server linked (as they can't DM the bot without sharing any servers with it)
@@ -54,18 +56,27 @@ class listenerCog(commands.Cog):
             await dm_channel.send(file=File("./img/hellothere.png"))
         except Exception as e:
             # if we can't send the DM, the user probably has DM's off, at which point we would uhhh, yeah. back to this later
-            await logger.log("Couldn't send DM to user that joined. Member ID: " + member.id + ". Error: " + e, bot, "WARNING")
-            await member.kick(reason="noDoot - User needs to be verified.. couldn't send DM to user")
+            await logger.log("Couldn't send DM to user that joined. Member ID: " + str(member.id) + " - Error: " + str(e), bot, "WARNING")
+            try:
+                await member.kick(reason="noDoot - User needs to be verified.. couldn't send DM to user")
+            except Exception as e:
+                await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "DEBUG")
+                return
+            await logger.log("Kicked a user from joining a guild, not verified. Couldn't send DM. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "DEBUG")
             return
 
         await dm_channel.send(content="**You have been kicked from a server protected from userbots by noDoot..**\nTo verify yourself across all servers using noDoot, please join this server to start the verification process: https://discord.gg/9kQ7Mvm\n\n*You are automatically kicked from the verification server after verification...*")
 
         # And then we kick them, for now.
-        await member.kick(reason="noDoot - User needs to be verified..")
+        try:
+            await member.kick(reason="noDoot - User needs to be verified..")
+        except Exception as e:
+            await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "DEBUG")
+            return
+        await logger.log("Kicked a user from joining a guild, not verified. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "DEBUG")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        logger.logDebug("A reaction has been added!", "DEBUG")
         bot = self.bot
         userid = payload.user_id
         channel = bot.get_channel(payload.channel_id)
@@ -108,9 +119,13 @@ class listenerCog(commands.Cog):
 
         # we check whether the reaction added is from the verification channel
         if payload.channel_id == int(os.getenv('verificationChannel')):
+            await logger.log("A reaction has been added in the verification channel! User ID: " + str(user.id), bot, "DEBUG")
             # Checking whether the user already is verified
             if isUserVerified(userid):
-                logger.logDebug("Already verified!", "DEBUG")
+                await logger.log("Already verified! User ID: " + str(user.id), bot, "DEBUG")
+                return
+
+            if user.bot == True:
                 return
 
             # if yes, send the user the verification message...
@@ -124,7 +139,7 @@ class listenerCog(commands.Cog):
                 await dm_channel.send(file=File("./img/verification.png"))
             except Exception as e:
                 # if we can't send the DM, the user probably has DM's off, at which point we would uhhh, yeah. back to this later
-                await logger.log("Couldn't send DM to user that reacted. User ID: " + user.id + ". Error: " + e, bot, "INFO")
+                await logger.log("Couldn't send DM to user that reacted. User ID: " + str(user.id) + " - Error: " + str(e), bot, "INFO")
                 # send a headsup in the verification channel
                 channel = bot.get_channel(int(os.getenv('verificationChannel')))
                 await channel.send(content=user.mention + " Sorry! It seems like your DM didn't go through, we're on the case!", delete_after=float(30))
@@ -134,6 +149,7 @@ class listenerCog(commands.Cog):
             captcha = generateCaptcha()
 
             # send the message
+            await logger.log("Verification sent to user: " + str(user.id), bot, "DEBUG")
             await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below!\n\n*If the captcha is not working, remove and add the reaction again, to create a new captcha, or contact HeroGamers#0001 in the noDoot Verification Server!*", file=File(captcha))
 
             # Delete the captcha from the filesystem
@@ -165,10 +181,9 @@ class listenerCog(commands.Cog):
         # return if author is a bot (we're also a bot)
         if message.author.bot:
             return
-        logger.logDebug("New message!", "DEBUG")
         # check if it's a DM
         if isinstance(message.channel, discord.DMChannel):
-            logger.logDebug("And it's in the DM's", "DEBUG")
+            await logger.log("New message in the DM's", bot, "DEBUG")
             # check if we even sent any captcha
             captcha_text = ""
             notFound = True
@@ -183,13 +198,13 @@ class listenerCog(commands.Cog):
             if notFound:
                 return
 
-            logger.logDebug("Captcha Text: " + captcha_text + ". Message content: " + message.content)
+            await logger.log("User: " + message.author.name + " `" + str(message.author.id) + "` - Captcha Text: " + captcha_text + " - Message content: " + message.content, bot, "DEBUG")
 
             # if the message content is equals to that of the message
             if message.content == captcha_text:
                 # If the user is already verified, do nothing
                 if isUserVerified(message.author.id):
-                    logger.logDebug("Already verified!", "DEBUG")
+                    await logger.log("User tried to do captcha again, but are already verified! User: " + message.author.name, bot, "DEBUG")
                     return
                 # if not, add them to the verified file
                 addUserToVerified(message.author.id)

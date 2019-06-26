@@ -10,13 +10,14 @@ class User(Model):
     Captcha_text = CharField()
     Verification_Date = DateTimeField()
     Verified = BooleanField()
+    Invite_Channel = CharField()
 
     class Meta:
         database = db
 
 def add_user(userid, name):
     try:
-        User.create(UserID=userid, DiscordTag_at_Verification=name, Captcha_text="", Verification_Date="", Verified=False)
+        User.create(UserID=userid, DiscordTag_at_Verification=name, Captcha_text="", Verification_Date="", Verified=False, Invite_Channel="")
     except IntegrityError as e:
         logger.logDebug("DB Notice: ID Already Used! - " + str(e), "DEBUG")
 
@@ -42,6 +43,14 @@ def add_captcha(userid, captchatext):
 def get_captcha(userid):
     query = User.select().where(User.UserID == userid)
     return query[0].Captcha_text
+
+def add_invite(userid, channelid):
+    query = User.update(Invite_Channel=channelid).where(User.UserID == userid)
+    query.execute()
+
+def get_invite(userid):
+    query = User.select().where(User.UserID == userid)
+    return query[0].Invite_Channel
 
 def create_tables():
     with db:

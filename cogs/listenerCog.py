@@ -13,6 +13,27 @@ class listenerCog(commands.Cog):
     async def on_member_join(self, member):
         bot = self.bot
 
+        # This is the function we run to try and find a channel with Create Instant Invite permissions, and where the user should be able to see the channels
+        # Really similar to already-made code below (memberNoDMProcedure(member, guild)), so for comments, please view that function...
+        async def memberFindInviteChannel(member, guild):
+            # Adding the member to the db
+            User.add_user(member.id, member.name + "#" + member.discriminator)
+
+            # finding the invite channel
+            channel_found = False
+            for channel in guild.channels:
+                if channel_found == False:
+                    if isinstance(channel, discord.CategoryChannel) or isinstance(channel, discord.VoiceChannel):
+                        continue
+                    user_permissions = channel.permissions_for(member)
+                    if user_permissions.read_messages:
+                        bot_permissions = channel.permissions_for(guild.get_member(bot.user.id))
+                        if bot_permissions.create_instant_invite:
+                            # And then we log the channel-ID to the database...
+                            User.add_invite(member.id, channel.id)
+                            channel_found = True
+                            break
+
         # This is the function that we run when a member tries to join a guild, but they don't have DM's enabled...
         async def memberNoDMProcedure(member, guild):
             channel_found = False # We want to have a variable that says whether we found a valid channel to remind the user in...
@@ -54,6 +75,9 @@ class listenerCog(commands.Cog):
                     await logger.log("User has verified themselves, stopping kick: " + member.name + " / " + str(member.id), bot, "INFO")
                     return
 
+                # Find a channel for the user to get an invite back to
+                await memberFindInviteChannel(member, guild)
+
                 # If user hasn't verified themselves, kick the user
                 try:
                     await member.kick(reason="noDoot - User needs to be verified.. couldn't send DM to user. Reminded on the server")
@@ -75,7 +99,7 @@ class listenerCog(commands.Cog):
                 # Send message
                 try:
                     await dm_channel.send(content="Hello there! On your guild (" + guild.name + "), it doesn't seem like there is a channel where both new members can see messages, and where I can write messages!\n" +
-                        "This means that the user: " + member.name + "`" + member.id + "`, that just tried to join your server, hasn't verified their account yet! Please setup a channel where I can write, and new users can read!")
+                        "This means that the user: " + member.name + "`" + str(member.id) + "`, that just tried to join your server, hasn't verified their account yet! Please setup a channel where I can write, and new users can read!")
                 except Exception as e:
                     # if we can't send the DM, the user probably has DM's off
                     await logger.log("Couldn't send DM to owner of server. Owner ID: " + str(owner.id) + " Guild: " + guild.name + " - Error: " + str(e), bot, "WARNING")
@@ -128,6 +152,9 @@ class listenerCog(commands.Cog):
         if User.isUserVerified(member.id):
             await logger.log("User is verified. Stopping the kick! User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "INFO")
             return
+
+        # Find a channel for the user to get an invite back to
+        await memberFindInviteChannel(member, member.guild)
 
         # Not verified, kicking
         try:
@@ -227,6 +254,21 @@ class listenerCog(commands.Cog):
                 "\n<https://discord.gg/PvFPEfd>")
             await logger.log("Sent feedback message to user: " + message.author.name, bot, "INFO")
 
+        # function to fetch an invite to the user, IF IT EXISTS!
+        async def fetchInvite(user):
+            inviteChannel = User.get_invite(user.id)
+            if inviteChannel == "":
+                return ""
+            try:
+                channel = bot.get_channel(int(inviteChannel))
+                if channel == None:
+                    await logger.log("Channel not found! ChannelID: " + inviteChannel, bot, "WARNING")
+                invite = await channel.create_invite(max_uses=1, max_age=3600, reason="noDoot - Instant Invite for " + user.name + ". Expires in 1 hour, single use.")
+                return " You can join back to the guild you wanted to join using this link: <" + invite.url + ">!"
+            except Exception as e:
+                await logger.log("Could not generate an invite to the user ( " + user.name + " `" + str(user.id) + "`)! - " + str(e), bot, "DEBUG")
+                return ""
+
         # return if author is a bot (we're also a bot)
         if message.author.bot:
             return
@@ -249,7 +291,8 @@ class listenerCog(commands.Cog):
                 User.verify_user(message.author.id)
                 # Send completion message
                 await logger.log("User completed captcha sucessfully! Added to verified users! User: " + message.author.name + " `" + str(message.author.id) + "`", bot, "INFO")
-                await message.channel.send(content="**Captcha completed successfully!**\nYour account is now verified!")
+                invite_message = await fetchInvite(message.author)
+                await message.channel.send(content="**Captcha completed successfully!**\nYour account is now verified!" + invite_message)
 
                 # Send Hack Week / Development Feedback Message
                 # REMOVE OR CHANGE AFTER HACK WEEK IS OVER

@@ -11,7 +11,7 @@ ___
 noDoot works by taking users who are joining a server, sending them an invite to the noDoot Verification Server, and kicking them after five minutes, if they aren't verified yet.  
 On the noDoot Verification Server, the user is sent a Captcha through their DM's, and once verified, the user will be able to join all servers using noDoot, and should never need to do the verification again, ever, because don't we all hate doing Captcha's?
 
-### How to get rid of UserDoots from your server
+## How to get rid of UserDoots from your server
 **WARNING BEFORE ADDING THE BOT:** ***Adding this bot to your server definitely helps with keeping the userbots away for your server, but for smaller servers it may also cause less members to actually join the server, as they would see it as a hassle to complete the verification process!***
 
 You can invite noDoot to your servers, and thus enable the verification process on them, using these invite links:

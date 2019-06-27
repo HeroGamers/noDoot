@@ -34,7 +34,7 @@ class administration(commands.Cog, name="Bot Administration"):
         await logger.logCommand("Remove User", ctx)
         await ctx.send(content="✅ Sucessfully made the query!")
 
-    @commands.command(name="verifyuser", aliases=["vu", "vuser"])
+    @commands.command(name="verifyuser", aliases=["vu", "vuser", "verify"])
     @commands.is_owner()
     async def _verifyuser(self, ctx, arg):
         """Verifies a user manually"""
@@ -44,7 +44,7 @@ class administration(commands.Cog, name="Bot Administration"):
         await logger.logCommand("Verify User", ctx)
         await ctx.send(content="✅ Sucessfully made the query!")
 
-    @commands.command(name="unverifyuser", aliases=["uvu", "removeverify", "uverifyuser"])
+    @commands.command(name="unverifyuser", aliases=["uvu", "removeverify", "unverify"])
     @commands.is_owner()
     async def _unverifyuser(self, ctx, arg):
         """Removes the verification from a user"""

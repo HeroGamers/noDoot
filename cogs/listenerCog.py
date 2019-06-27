@@ -59,6 +59,7 @@ class listenerCog(commands.Cog):
                                 "Please verify your account on this server: <https://discord.gg/9kQ7Mvm>, and then try joining again!\n\n" +
                                 "**This message will self-destruct in five minutes, and you will be kicked from the server if you haven't verified yourself!**")
                             channel_found = True
+                            await logger.log("Channel where message has been sent: #" + channel.name + " (`" + str(channel.id) + "`)", bot, "DEBUG")
                             break
             if channel_found:
                 # do something
@@ -132,7 +133,7 @@ class listenerCog(commands.Cog):
 
         # Send first image
         try:
-            await dm_channel.send(file=File("./img/hellothere.png"))
+            await dm_channel.send(file=File("./img/nodoot_hello.png"))
         except Exception as e:
             # if we can't send the DM, the user probably has DM's off, at which point we would send them a heads-up in the server they're trying to join, and then kick them a minute or so afterwards
             await logger.log("Couldn't send DM to user that joined. Member ID: " + str(member.id) + " - Error: " + str(e), bot, "INFO")
@@ -220,7 +221,7 @@ class listenerCog(commands.Cog):
 
             # Send first image
             try:
-                await dm_channel.send(file=File("./img/verification.png"))
+                await dm_channel.send(file=File("./img/nodoot_final_step.png"))
             except Exception as e:
                 # if we can't send the DM, the user probably has DM's off, at which point we would uhhh, yeah. back to this later
                 await logger.log("Couldn't send DM to user that reacted. User ID: " + str(user.id) + " - Error: " + str(e), bot, "INFO")
@@ -239,7 +240,7 @@ class listenerCog(commands.Cog):
             # send the message
             appinfo = await bot.application_info()
             await logger.log("Verification sent to user: " + str(user.id), bot, "DEBUG")
-            await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below!\n\n" +
+            await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below (the captcha is case-sensitive)!\n\n" +
                 "*If the captcha is not working, remove and add the reaction again to generate a new captcha, or if you are stuck, then contact " + appinfo.owner.mention + " in the noDoot Verification Server through DM's!*", file=File(captcha[0]))
             # Delete the captcha from the filesystem
             os.remove(captcha[0])

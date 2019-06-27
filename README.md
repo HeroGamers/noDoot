@@ -22,8 +22,8 @@ On the noDoot Verification Server, the user is sent a Captcha through their DM's
 |--------------------|---------------|-----------------------------------|-------------------------------------------------|-------------|------------------------------------|
 | Bot Administration | ~adduser      | ~au                               | Adds a user to the database                     | Bot Owner   | ~adduser <User ID or Mention>      |
 | Bot Administration | ~removeuser   | ~ru                               | Removes a user from the database                | Bot Owner   | ~removeuser <User ID or Mention>   |
-| Bot Administration | ~verifyuser   | ~vu, ~vuser                       | Verifies a user manually                        | Bot Owner   | ~verifyuser <User ID or Mention>   |
-| Bot Administration | ~unverifyuser | ~uvu, ~removeverify, ~uverifyuser | Removes the verification from a user            | Bot Owner   | ~unverifyuser <User ID or Mention> |
+| Bot Administration | ~verifyuser   | ~vu, ~vuser, ~verify              | Verifies a user manually                        | Bot Owner   | ~verifyuser <User ID or Mention>   |
+| Bot Administration | ~unverifyuser | ~uvu, ~removeverify, ~unverify    | Removes the verification from a user            | Bot Owner   | ~unverifyuser <User ID or Mention> |
 | Bot Administration | ~stop         | ~restart, ~shutdown               | Stops the bot's script                          | Bot Owner   | ~stop                              |
 | Information        | ~botinfo      | ~info                             | Gets information about the bot                  | Everyone    | ~botinfo                           |
 | Information        | ~invite       | ~inv, ~botinvite, ~botinv         | Sends OAuth 2 links to add the bot              | Everyone    | ~invite                            |

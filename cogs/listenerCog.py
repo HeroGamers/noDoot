@@ -237,10 +237,10 @@ class listenerCog(commands.Cog):
             await logger.log("Added captcha for user: " + str(user.id) + " to the db. Captcha_text: " + captcha[1], bot, "DEBUG")
 
             # send the message
+            appinfo = await bot.application_info()
             await logger.log("Verification sent to user: " + str(user.id), bot, "DEBUG")
             await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below!\n\n" +
-                "*If the captcha is not working, remove and add the reaction again, to create a new captcha, or contact HeroGamers#0001 in the noDoot Verification Server!*", file=File(captcha[0]))
-
+                "*If the captcha is not working, remove and add the reaction again to generate a new captcha, or if you are stuck, then contact " + appinfo.owner.mention + " in the noDoot Verification Server through DM's!*", file=File(captcha[0]))
             # Delete the captcha from the filesystem
             os.remove(captcha[0])
 
@@ -257,8 +257,9 @@ class listenerCog(commands.Cog):
             await logger.log("New message in the DM's", bot, "DEBUG")
 
             async def sendFeedbackMessage(message):
+                appinfo = await bot.application_info()
                 await message.channel.send(content="__**Discord Hack Week Improvement Message**__\nThanks for using the noDoot bot, which I have made as a part of the Discord Hack Week. " +
-                    "If you want to leave feedback on the bot, then you can come give feedback on the verification process through Treeland (or just join so you can DM me, HeroGamers#0001)" +
+                    "If you want to leave feedback on the bot, then you can come give feedback on the verification process through Treeland (or just join so you can DM me, " + appinfo.owner.mention + ")" +
                     "\n<https://discord.gg/PvFPEfd>")
                 await logger.log("Sent feedback message to user: " + message.author.name, bot, "INFO")
 

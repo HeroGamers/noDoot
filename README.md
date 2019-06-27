@@ -36,7 +36,7 @@ You can invite noDoot to your servers, and thus enable the verification process 
 [![Invite noDoot - Kick Members](https://img.shields.io/static/v1.svg?label=Invite%20noDoot&message=Kick%20Permissions&color=7289DA&stile=flat&logo=discord&logoColor=7289DA&labelColor=2C2F33)](https://discordapp.com/oauth2/authorize?client_id=592829567660457985&scope=bot&permissions=2)  
 [![Invite noDoot - Invite Members](https://img.shields.io/static/v1.svg?label=Invite%20noDoot&message=Invite%20Permissions&color=7289DA&stile=flat&logo=discord&logoColor=7289DA&labelColor=2C2F33)](https://discordapp.com/oauth2/authorize?client_id=592829567660457985&scope=bot&permissions=3)
 
-*The Kick Members Permissions is required, but can be given through other roles if wanted. The Create Instant Invite Permissions is optional, but is required if you want the bot to give the user a new invite back to the server they tried to join, if kicked.*
+*The Kick Members Permissions is required, but can be given through other roles if wanted. The Create Instant Invite Permissions is optional, but is required if you want the bot to give the user a new invite back to the server they tried to join, if kicked. It is highly recommended to turn off the random welcome messages, as the bot will not delete those after a possible kick.*
 
 ### Leaving Feedback
 I would be very happy if you could give some feedback on the bot, after you have tried the verification process. After the verification process is done, the bot will send an invite to my server, Treeland, where you can then afterwards send me a DM through.

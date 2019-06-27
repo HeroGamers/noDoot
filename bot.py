@@ -32,7 +32,7 @@ async def on_ready():
         # Sending the message
         await logger.log("Sending the verification message...", bot, "INFO")
         await channel.send(file=File("./img/verify.png"))
-        vmessage = await channel.send(content="Hello there! Welcome to the noDoot Server! Don't worry, you won't be here for long...\n" +
+        vmessage = await channel.send(content="Hello there! Welcome to the noDoot Verification Server! Don't worry, you won't be here for long...\n" +
             "\nFirst of all, I need you to be sure to have DM's enabled for this server.\nAfter that, please click the reaction to this message, to begin the verification process!")
 
         # now we add a reaction to the message

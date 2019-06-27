@@ -23,7 +23,7 @@ class info(commands.Cog, name="Information"):
         await ctx.send("To invite the bot to your server, click one of the following links:\n\n" +
             "**[Recommended Option]:**\nWith Create Instant Invite Permissions: <https://discordapp.com/oauth2/authorize?client_id=592829567660457985&scope=bot&permissions=3>\n" +
             "**[Not Recommended Option]:**\nWithout Create Instant Invite Permissions: <https://discordapp.com/oauth2/authorize?client_id=592829567660457985&scope=bot&permissions=2>\n\n" +
-            "**Notice:**\n*The Kick Members Permissions is required, but can be given through other roles if wanted. The Create Instant Invite Permissions is optional, but is required if you want the bot to give the user a new invite back to the server they tried to join, if kicked.*")
+            "**Notice:**\n*The Kick Members Permissions is required, but can be given through other roles if wanted. The Create Instant Invite Permissions is optional, but is required if you want the bot to give the user a new invite back to the server they tried to join, if kicked. It is highly recommended to turn off the random welcome messages, as the bot will not delete those after a possible kick.*")
 
     @commands.command(name="feedback", aliases=["support"])
     async def _feedback(self, ctx):

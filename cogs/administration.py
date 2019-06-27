@@ -2,7 +2,7 @@ import User
 from discord.ext import commands
 from utilities import logger
 
-class administration(commands.Cog, name="User Administration"):
+class administration(commands.Cog, name="Bot Administration"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -53,6 +53,15 @@ class administration(commands.Cog, name="User Administration"):
         User.unverify_user(userid)
         await logger.logCommand("Unverify User", ctx)
         await ctx.send(content="✅ Sucessfully made the query!")
+
+    @commands.command(name="stop", aliases=["restart", "shutdown"])
+    @commands.is_owner()
+    async def _stop(self, ctx):
+        """Stops the bot's script"""
+        await logger.logCommand("Stop", ctx)
+        await ctx.send(content="✅ Stopping the bot!")
+        await ctx.bot.logout()
+        await ctx.bot.close()
 
 def setup(bot):
     bot.add_cog(administration(bot))

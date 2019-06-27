@@ -30,8 +30,15 @@ class info(commands.Cog, name="Information"):
         """Leave feedback or get support regarding the bot"""
         await logger.logCommand("Bot Feedback/Support", ctx)
         await ctx.send("**Hello there!**\n" +
-            "To leave Feedback and/or get Support regarding the bot, please reach out to me in my DM's, or through my own server, Treeland:\n" +
+            "To leave Feedback and/or get Support regarding the bot, please reach out to HeroGamers#0001's DM's, or through Treeland:\n" +
             "<https://discord.gg/PvFPEfd>")
+
+    @commands.command(name="source", aliases=["sourcecode", "github", "git"])
+    async def _source(self, ctx):
+        """Sends a link to the bot's GitHub page"""
+        await logger.logCommand("Source Code", ctx)
+        await ctx.send("More sauce, please! Oh, you asked for the source? Well, did you know that noDoot is an Open Sourced bot, and that means that yo~ ..oh, you just wanted the link..? W-w-well here you go, you can view my code at:\n" +
+            "https://github.com/Fido2603/noDoot")
 
 def setup(bot):
     bot.add_cog(info(bot))

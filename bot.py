@@ -8,10 +8,13 @@ except ImportError:
     print("Couldn't import config.py")
 
 # We load the bot
-bot = commands.Bot(command_prefix=os.getenv('prefix'), description='Holding out UserDoots from guilds since the Discord Hack Week 19')
+bot = commands.Bot(command_prefix=os.getenv('prefix'), description="Holding out UserDoots from guilds since the Discord Hack Week 19.\n" +
+                                                                    "A Discord bot made by HeroGamers#0001, using the discord.py library.")
 
 # And define which extensions we want to have loaded at startup
-startup_extensions = ["listenerCog"]
+startup_extensions = ["listenerCog",
+                      "administration",
+                      "info"]
 
 @bot.event
 async def on_ready():
@@ -19,7 +22,7 @@ async def on_ready():
     logger.setup_logger()
 
     # change the bot presence
-    await bot.change_presence(activity=discord.Game(name="around with new members..."))
+    await bot.change_presence(activity=discord.Game(name="around with new members... [" + os.getenv('prefix') + "help]"))
 
     # check for the message in the verification channel, if it's not there, send it.
     channel = bot.get_channel(int(os.getenv('verificationChannel')))

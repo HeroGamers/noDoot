@@ -17,7 +17,7 @@ class listenerCog(commands.Cog):
         # Really similar to already-made code below (memberNoDMProcedure(member, guild)), so for comments, please view that function...
         async def memberFindInviteChannel(member, guild):
             # Adding the member to the db
-            User.add_user(member.id, member.name + "#" + member.discriminator)
+            await User.add_user(member.id, member.name + "#" + member.discriminator, bot)
 
             # finding the invite channel
             channel_found = False
@@ -210,7 +210,7 @@ class listenerCog(commands.Cog):
                 return
 
             # Add the user to the db
-            User.add_user(user.id, user.name + "#" + user.discriminator)
+            await User.add_user(user.id, user.name + "#" + user.discriminator, bot)
 
             # if yes, send the user the verification message...
             dm_channel = user.dm_channel
@@ -248,27 +248,6 @@ class listenerCog(commands.Cog):
     async def on_message(self, message):
         bot = self.bot
 
-        async def sendFeedbackMessage(message):
-            await message.channel.send(content="__**Discord Hack Week Improvement Message**__\nThanks for using the noDoot bot, which I have made as a part of the Discord Hack Week. " +
-                "If you want to leave feedback on the bot, then you can come give feedback on the verification process through Treeland (or just join so you can DM me, HeroGamers#0001)" +
-                "\n<https://discord.gg/PvFPEfd>")
-            await logger.log("Sent feedback message to user: " + message.author.name, bot, "INFO")
-
-        # function to fetch an invite to the user, IF IT EXISTS!
-        async def fetchInvite(user):
-            inviteChannel = User.get_invite(user.id)
-            if inviteChannel == "":
-                return ""
-            try:
-                channel = bot.get_channel(int(inviteChannel))
-                if channel == None:
-                    await logger.log("Channel not found! ChannelID: " + inviteChannel, bot, "WARNING")
-                invite = await channel.create_invite(max_uses=1, max_age=3600, reason="noDoot - Instant Invite for " + user.name + ". Expires in 1 hour, single use.")
-                return " You can join back to the guild you wanted to join using this link: <" + invite.url + ">!"
-            except Exception as e:
-                await logger.log("Could not generate an invite to the user ( " + user.name + " `" + str(user.id) + "`)! - " + str(e), bot, "DEBUG")
-                return ""
-
         # return if author is a bot (we're also a bot)
         if message.author.bot:
             return
@@ -276,6 +255,28 @@ class listenerCog(commands.Cog):
         # check if it's a DM
         if isinstance(message.channel, discord.DMChannel):
             await logger.log("New message in the DM's", bot, "DEBUG")
+
+            async def sendFeedbackMessage(message):
+                await message.channel.send(content="__**Discord Hack Week Improvement Message**__\nThanks for using the noDoot bot, which I have made as a part of the Discord Hack Week. " +
+                    "If you want to leave feedback on the bot, then you can come give feedback on the verification process through Treeland (or just join so you can DM me, HeroGamers#0001)" +
+                    "\n<https://discord.gg/PvFPEfd>")
+                await logger.log("Sent feedback message to user: " + message.author.name, bot, "INFO")
+
+            # function to fetch an invite to the user, IF IT EXISTS!
+            async def fetchInvite(user):
+                inviteChannel = User.get_invite(user.id)
+                if inviteChannel == "":
+                    return ""
+                try:
+                    channel = bot.get_channel(int(inviteChannel))
+                    if channel == None:
+                        await logger.log("Channel not found! ChannelID: " + inviteChannel, bot, "WARNING")
+                    invite = await channel.create_invite(max_uses=1, max_age=3600, reason="noDoot - Instant Invite for " + user.name + ". Expires in 1 hour, single use.")
+                    return " You can join back to the guild you wanted to join using this link: <" + invite.url + ">!"
+                except Exception as e:
+                    await logger.log("Could not generate an invite to the user ( " + user.name + " `" + str(user.id) + "`)! - " + str(e), bot, "DEBUG")
+                    return ""
+
             # check the captcha
             captcha_text = User.get_captcha(message.author.id)
 

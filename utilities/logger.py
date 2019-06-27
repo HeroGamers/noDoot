@@ -54,3 +54,6 @@ def logDebug(message, level="INFO"):
         logger.error(message)
     else:
         logger.info(message)
+
+async def logCommand(commandName, ctx, level="INFO"):
+    await log(ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command, in the channel #" + ctx.channel.name + " (`" + str(ctx.channel.id) + "`), in the guild " + ctx.guild.name + " (`" + str(ctx.guild.id) + "`)", ctx.bot, level)

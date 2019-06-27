@@ -18,15 +18,15 @@ On the noDoot Verification Server, the user is sent a Captcha through their DM's
 -   [x] Global Verification - A one-time verification across all servers using noDoot
 
 ### Commands
-Category | Command | Aliases | Description | Who can use | Usage
--------- | ------- | ------- | ----------- | ----------- | -----
-User Administration | ~adduser | ~au | Adds a user to the database | Bot Owner | ~adduser \<User ID or Mention>
-User Administration | ~removeuser | ~ru | Removes a user from the database | Bot Owner | ~removeuser \<User ID or Mention>
-User Administration | ~verifyuser | ~vu, ~vuser | Verifies a user manually | Bot Owner | ~verifyuser \<User ID or Mention>
-User Administration | ~unverifyuser | ~uvu, ~removeverify, ~uverifyuser | Removes the verification from a user | Bot Owner | ~unverifyuser \<User ID or Mention>
-Information | ~botinfo | ~info | Gets information about the bot | Bot Owner | ~botinfo
-Information | ~invite | ~inv, ~botinvite, ~botinv | Sends OAuth 2 links to add the bot | Everyone | ~invite
-Information | ~feedback | ~support | Leave feedback or get support regarding the bot | Everyone | ~feedback
+| Category            | Command       | Aliases                           | Description                                     | Who can use | Usage                              |
+|---------------------|---------------|-----------------------------------|-------------------------------------------------|-------------|------------------------------------|
+| User Administration | ~adduser      | ~au                               | Adds a user to the database                     | Bot Owner   | ~adduser <User ID or Mention>      |
+| User Administration | ~removeuser   | ~ru                               | Removes a user from the database                | Bot Owner   | ~removeuser <User ID or Mention>   |
+| User Administration | ~verifyuser   | ~vu, ~vuser                       | Verifies a user manually                        | Bot Owner   | ~verifyuser <User ID or Mention>   |
+| User Administration | ~unverifyuser | ~uvu, ~removeverify, ~uverifyuser | Removes the verification from a user            | Bot Owner   | ~unverifyuser <User ID or Mention> |
+| Information         | ~botinfo      | ~info                             | Gets information about the bot                  | Bot Owner   | ~botinfo                           |
+| Information         | ~invite       | ~inv, ~botinvite, ~botinv         | Sends OAuth 2 links to add the bot              | Everyone    | ~invite                            |
+| Information         | ~feedback     | ~support                          | Leave feedback or get support regarding the bot | Everyone    | ~feedback                          |
 
 ## How to get rid of UserDoots from your server
 **WARNING BEFORE ADDING THE BOT:** ***Adding this bot to your server definitely helps with keeping the userbots away for your server, but for smaller servers it may also cause less members to actually join the server, as they would see it as a hassle to complete the verification process!***

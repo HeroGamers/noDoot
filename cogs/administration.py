@@ -1,4 +1,4 @@
-import discord, User
+import User
 from discord.ext import commands
 from utilities import logger
 
@@ -6,12 +6,13 @@ class administration(commands.Cog, name="User Administration"):
     def __init__(self, bot):
         self.bot = bot
 
-    def getuserid(self, arg):
+    @classmethod
+    def getuserid(cls, arg):
         if arg.startswith("<@") and arg.endswith(">"):
             return arg.replace("<@", "").replace(">", "")
         else:
             return arg
-    
+
     @commands.command(name="adduser", aliases=["au"])
     @commands.is_owner()
     async def _adduser(self, ctx, arg):
@@ -22,7 +23,7 @@ class administration(commands.Cog, name="User Administration"):
         await User.add_user(userid, user.name + "#" + user.discriminator, ctx.bot)
         await logger.logCommand("AddUser", ctx)
         await ctx.send(content="✅ Sucessfully made the query!")
-    
+
     @commands.command(name="removeuser", aliases=["ru"])
     @commands.is_owner()
     async def _removeuser(self, ctx, arg):
@@ -52,7 +53,6 @@ class administration(commands.Cog, name="User Administration"):
         User.unverify_user(userid)
         await logger.logCommand("Unverify User", ctx)
         await ctx.send(content="✅ Sucessfully made the query!")
-                
 
 def setup(bot):
     bot.add_cog(administration(bot))

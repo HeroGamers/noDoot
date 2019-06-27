@@ -7,7 +7,6 @@ class info(commands.Cog, name="Information"):
         self.bot = bot
 
     @commands.command(name="botinfo", aliases=["info"])
-    @commands.is_owner()
     async def _botinfo(self, ctx):
         """Gets information about the bot"""
         embed = discord.Embed(title="noDoot Bot Information", color=discord.Color.from_rgb(114, 137, 218), timestamp=datetime.datetime.now(),

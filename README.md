@@ -27,7 +27,7 @@ On the noDoot Verification Server, the user is sent a Captcha through their DM's
 ## Commands & Features
 ### Key Features
 -   [x] Keeps out userbots without you having to lift a finger
--   [x] No setup of the bot on your server, other than the permissions given to the bot upon invitation of the bot
+-   [x] No setup of the bot on your server, other than the permissions given to the bot upon invitation
 -   [x] Global Verification - A one-time verification across all servers using noDoot
 
 ### Commands

@@ -114,7 +114,7 @@ class listenerCog(commands.Cog):
 
         # if the member joined the main guild, do nothing
         await logger.log("New member tried to join somewhere! Member: " + member.name + " - Guild: " + member.guild.name, bot, "INFO")
-        if member.guild.id == int(os.getenv('nDGuild')):
+        if member.guild.id == int(os.getenv('guild')):
             if User.isUserVerified(member.id):
                 await logger.log("Already verified user tried to join noDoot: " + member.name + " / " + str(member.id), bot, "DEBUG")
                 await member.kick(reason="noDoot - User already verified!")
@@ -302,7 +302,7 @@ class listenerCog(commands.Cog):
                 await sendFeedbackMessage(message)
 
                 # Kick from the noDoot Server
-                await bot.get_guild(int(os.getenv('nDGuild'))).kick(message.author, reason="noDoot - User verified sucessfully!")
+                await bot.get_guild(int(os.getenv('guild'))).kick(message.author, reason="noDoot - User verified sucessfully!")
                 return
             # if not
             await message.channel.send(content="**Incorrect answer! Try again...**\n*If the captcha won't work, contact HeroGamers#0001 on the noDoot Server!*")

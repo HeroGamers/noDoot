@@ -39,6 +39,10 @@ async def on_ready():
         await vmessage.add_reaction("✅")
 
     # Bot startup is now done...
+    logger.logDebug("----------[LOGIN SUCESSFULL]----------", "INFO")
+    logger.logDebug("     Username: " + bot.user.name, "INFO")
+    logger.logDebug("     UserID:   " + str(bot.user.id), "INFO")
+    logger.logDebug("--------------------------------------", "INFO")
     await logger.log("Bot startup done.", bot, "INFO", "Bot startup done.\n")
 
 @bot.event

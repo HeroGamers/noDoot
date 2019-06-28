@@ -9,7 +9,7 @@ class info(commands.Cog, name="Information"):
     @commands.command(name="botinfo", aliases=["info"])
     async def _botinfo(self, ctx):
         """Gets information about the bot"""
-        embed = discord.Embed(title="noDoot Bot Information", color=discord.Color.from_rgb(114, 137, 218), timestamp=datetime.datetime.now(),
+        embed = discord.Embed(title="noDoot Bot Information", color=discord.Color.from_rgb(114, 137, 218), timestamp=datetime.datetime.utcnow(),
             description="The bot is currently in `%s` guilds, with a total of `%s` users!" % (len(ctx.bot.guilds), len(ctx.bot.users)))
         embed.add_field(name="Verified users", value="%s" % User.count_verified_users(), inline=True)
         await logger.logCommand("Bot Info", ctx)

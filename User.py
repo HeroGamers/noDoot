@@ -46,15 +46,21 @@ def add_captcha(userid, captchatext):
 
 def get_captcha(userid):
     query = User.select().where(User.UserID == userid)
-    return query[0].Captcha_text
+    try:
+        return query[0].Captcha_text
+    except IndexError:
+        return "No Captcha"
 
 def add_invite(userid, channelid):
     query = User.update(Invite_Channel=channelid).where(User.UserID == userid)
     query.execute()
 
-def get_invite(userid):
+def get_invite_channel(userid):
     query = User.select().where(User.UserID == userid)
-    return query[0].Invite_Channel
+    try:
+        return query[0].Invite_Channel
+    except IndexError:
+        return ""
 
 def count_verified_users():
     query = User.select().where(User.Verified == True).count()

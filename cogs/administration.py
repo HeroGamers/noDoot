@@ -55,6 +55,16 @@ class administration(commands.Cog, name="Bot Administration"):
         await logger.logCommand("Unverify User", ctx)
         await ctx.send(content="✅ Sucessfully made the query!")
 
+    @commands.command(name="getcaptcha", aliases=["gc", "captcha"])
+    @commands.is_owner()
+    async def _getcaptcha(self, ctx, arg):
+        """Gets a user's current captcha"""
+        userid = self.getuserid(arg)
+        # gets the captcha
+        captcha = User.get_captcha(userid)
+        await logger.logCommand("Get Captcha", ctx)
+        await ctx.send(content="✅ Sucessfully made the query! Captcha: `" + captcha + "`")
+
     @commands.command(name="stop", aliases=["restart", "shutdown"])
     @commands.is_owner()
     async def _stop(self, ctx):

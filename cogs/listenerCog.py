@@ -173,8 +173,8 @@ class listenerCog(commands.Cog):
         user = channel.guild.get_member(userid)
 
         def generateCaptcha():
-            # First we generate a random string to use
-            chars = string.ascii_letters + string.digits
+            # First we generate a random string to use // Changed to only use lowercase letters, as by user requests
+            chars = string.ascii_lowercase + string.digits
             text = ''.join(random.choice(chars) for x in range(5))
 
             # And generate the captcha
@@ -227,7 +227,7 @@ class listenerCog(commands.Cog):
                 await logger.log("Couldn't send DM to user that reacted. User ID: " + str(user.id) + " - Error: " + str(e), bot, "INFO")
                 # send a headsup in the verification channel
                 channel = bot.get_channel(int(os.getenv('verificationChannel')))
-                await channel.send(content=user.mention + " Sorry! It seems like your DM didn't go through, we're on the case!", delete_after=float(30))
+                await channel.send(content=user.mention + " Sorry! It seems like your DM didn't go through, try to enable your DM's for this server!", delete_after=float(30))
                 return
 
             # generate a captcha
@@ -235,12 +235,12 @@ class listenerCog(commands.Cog):
 
             # Put the captcha into the db
             User.add_captcha(user.id, captcha[1])
-            await logger.log("Added captcha for user: " + str(user.id) + " to the db. Captcha_text: " + captcha[1], bot, "DEBUG")
+            await logger.log("Added captcha for user: " + user.name + " (" + str(user.id) + ") to the db. Captcha_text: " + captcha[1], bot, "INFO")
 
             # send the message
             appinfo = await bot.application_info()
             await logger.log("Verification sent to user: " + str(user.id), bot, "DEBUG")
-            await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below (the captcha is case-sensitive)!\n\n" +
+            await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below (the captcha may consist of lowercase letters and numbers)!\n\n" +
                 "*If the captcha is not working, remove and add the reaction again to generate a new captcha, or if you are stuck, then contact " + appinfo.owner.mention + " in the noDoot Verification Server through DM's!*", file=File(captcha[0]))
             # Delete the captcha from the filesystem
             os.remove(captcha[0])
@@ -257,16 +257,9 @@ class listenerCog(commands.Cog):
         if isinstance(message.channel, discord.DMChannel):
             await logger.log("New message in the DM's", bot, "DEBUG")
 
-            async def sendFeedbackMessage(message):
-                appinfo = await bot.application_info()
-                await message.channel.send(content="__**Discord Hack Week Improvement Message**__\nThanks for using the noDoot bot, which I have made as a part of the Discord Hack Week. " +
-                    "If you want to leave feedback on the bot, then you can come give feedback on the verification process through Treeland (or just join so you can DM me, " + appinfo.owner.mention + ")" +
-                    "\n<https://discord.gg/PvFPEfd>")
-                await logger.log("Sent feedback message to user: " + message.author.name, bot, "INFO")
-
             # function to fetch an invite to the user, IF IT EXISTS!
             async def fetchInvite(user):
-                inviteChannel = User.get_invite(user.id)
+                inviteChannel = User.get_invite_channel(user.id)
                 if inviteChannel == "":
                     return ""
                 try:
@@ -297,15 +290,14 @@ class listenerCog(commands.Cog):
                 invite_message = await fetchInvite(message.author)
                 await message.channel.send(content="**Captcha completed successfully!**\nYour account is now verified!" + invite_message)
 
-                # Send Hack Week / Development Feedback Message
-                # REMOVE OR CHANGE AFTER HACK WEEK IS OVER
-                await sendFeedbackMessage(message)
-
                 # Kick from the noDoot Server
-                await bot.get_guild(int(os.getenv('guild'))).kick(message.author, reason="noDoot - User verified sucessfully!")
+                try:
+                    await bot.get_guild(int(os.getenv('guild'))).kick(message.author, reason="noDoot - User verified sucessfully!")
+                except Exception as e:
+                    await logger.log("Not enough permissions to kick user from the noDoot Verification Guild! User: " + message.author.name + " (`" + str(message.author.id) + "`) - " + str(e), bot, "DEBUG")
                 return
             # if not
-            await message.channel.send(content="**Incorrect answer! Try again...**\n*If the captcha won't work, contact HeroGamers#0001 on the noDoot Server!*")
+            await message.channel.send(content="**Incorrect answer! Try again...**\n*If the captcha won't work, contact HeroGamers#0001 (listed as noDoot Developer on the noDoot Verification Server)!*")
 
 def setup(bot):
     bot.add_cog(listenerCog(bot))

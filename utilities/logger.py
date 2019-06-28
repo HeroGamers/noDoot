@@ -16,10 +16,15 @@ def setup_logger():
 
     logger = logging.getLogger("noDoot")
     logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG) # CAN BE CHANGED TO "logging.DEBUG", when run locally to enable debugging!
     logger.addHandler(screen_handler)
 
 async def log(message, bot, level="INFO", debug=""):
+    # Return if the logging level is not DEBUG, and the bot is trying to log some debugging stuff
+    logger = logging.getLogger("noDoot")
+    if (logger.getEffectiveLevel != logging.DEBUG) and (level == "DEBUG"):
+        return
+
     logChannel = bot.get_channel(int(os.getenv('log')))
     time = datetime.datetime.now().strftime('%H:%M:%S')
 

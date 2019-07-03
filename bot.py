@@ -8,13 +8,14 @@ except ImportError:
     print("Couldn't import config.py")
 
 # We load the bot
-bot = commands.Bot(command_prefix=os.getenv('prefix'), description="Holding out UserDoots from guilds since the Discord Hack Week 19.\n" +
+bot = commands.Bot(command_prefix=os.getenv('prefix'), description="Holding out UserDoots from guilds since the June 2019.\n" +
                                                                     "A Discord bot made by HeroGamers#0001, using the discord.py library.")
 
 # And define which extensions we want to have loaded at startup
 startup_extensions = ["listenerCog",
                       "administration",
-                      "info"]
+                      "info",
+                      "userInteraction"]
 
 @bot.event
 async def on_ready():

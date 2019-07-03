@@ -1,9 +1,9 @@
 import discord, asyncio, User
 from discord import File
 from discord.ext import commands
-from utilities import logger
+from utilities import logger, captchaHandler
 from captcha.image import ImageCaptcha
-import os, random, string
+import os
 
 class listenerCog(commands.Cog):
     def __init__(self, bot):
@@ -100,7 +100,7 @@ class listenerCog(commands.Cog):
                 # Send message
                 try:
                     await dm_channel.send(content="Hello there! On your guild (" + guild.name + "), it doesn't seem like there is a channel where both new members can see messages, and where I can write messages!\n" +
-                        "This means that the user: " + member.name + "`" + str(member.id) + "`, that just tried to join your server, hasn't verified their account yet! Please setup a channel where I can write, and new users can read!")
+                        "This means that the user: " + member.name + " `" + str(member.id) + "`, that just tried to join your server, hasn't verified their account yet! Please setup a channel where I can write, and new users can read!")
                 except Exception as e:
                     # if we can't send the DM, the user probably has DM's off
                     await logger.log("Couldn't send DM to owner of server. Owner ID: " + str(owner.id) + " Guild: " + guild.name + " - Error: " + str(e), bot, "WARNING")
@@ -172,32 +172,6 @@ class listenerCog(commands.Cog):
         channel = bot.get_channel(payload.channel_id)
         user = channel.guild.get_member(userid)
 
-        def generateCaptcha():
-            # First we generate a random string to use // Changed to only use lowercase letters, as by user requests
-            chars = string.ascii_lowercase + string.digits
-            text = ''.join(random.choice(chars) for x in range(5))
-
-            # And generate the captcha
-            captchaimage = ImageCaptcha()
-
-            image = captchaimage.generate_image(text)
-
-            # Now to add some noise
-            captchaimage.create_noise_curve(image, image.getcolors())
-            captchaimage.create_noise_dots(image, image.getcolors())
-
-            # Now to write the file
-            filenumber = 0
-            while True:
-                if os.path.exists("./img/captcha_" + str(filenumber) + ".png"):
-                    filenumber += 1
-                else:
-                    break
-            imagefile = "./img/captcha_" + str(filenumber) + ".png"
-            captchaimage.write(text, imagefile)
-
-            return imagefile, text
-
         # we check whether the reaction added is from the verification channel
         if payload.channel_id == int(os.getenv('verificationChannel')):
             await logger.log("A reaction has been added in the verification channel! User ID: " + str(user.id), bot, "DEBUG")
@@ -231,7 +205,7 @@ class listenerCog(commands.Cog):
                 return
 
             # generate a captcha
-            captcha = generateCaptcha()
+            captcha = captchaHandler.generateCaptcha()
 
             # Put the captcha into the db
             User.add_captcha(user.id, captcha[1])
@@ -240,8 +214,8 @@ class listenerCog(commands.Cog):
             # send the message
             appinfo = await bot.application_info()
             await logger.log("Verification sent to user: " + str(user.id), bot, "DEBUG")
-            await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below (the captcha may consist of lowercase letters and numbers)!\n\n" +
-                "*If the captcha is not working, remove and add the reaction again to generate a new captcha, or if you are stuck, then contact " + appinfo.owner.mention + " in the noDoot Verification Server through DM's!*", file=File(captcha[0]))
+            await dm_channel.send(content="Now, to finish your verification process and gain access to servers using noDoot, please complete the captcha below (the captcha may consist of **lowercase letters** and **numbers**)!\n\n" +
+                "*If the captcha is not working, write `" + os.getenv('prefix') + "newcaptcha` again to generate a new captcha, or if you are stuck, then contact " + appinfo.owner.mention + " in the noDoot Verification Server through DM's!*", file=File(captcha[0]))
             # Delete the captcha from the filesystem
             os.remove(captcha[0])
 
@@ -257,47 +231,48 @@ class listenerCog(commands.Cog):
         if isinstance(message.channel, discord.DMChannel):
             await logger.log("New message in the DM's", bot, "DEBUG")
 
-            # function to fetch an invite to the user, IF IT EXISTS!
-            async def fetchInvite(user):
-                inviteChannel = User.get_invite_channel(user.id)
-                if inviteChannel == "":
-                    return ""
-                try:
-                    channel = bot.get_channel(int(inviteChannel))
-                    if channel == None:
-                        await logger.log("Channel not found! ChannelID: " + inviteChannel, bot, "WARNING")
-                    invite = await channel.create_invite(max_uses=1, max_age=3600, reason="noDoot - Instant Invite for " + user.name + ". Expires in 1 hour, single use.")
-                    return " You can join back to the guild you wanted to join using this link: <" + invite.url + ">!"
-                except Exception as e:
-                    await logger.log("Could not generate an invite to the user ( " + user.name + " `" + str(user.id) + "`)! - " + str(e), bot, "DEBUG")
-                    return ""
+            if not User.isUserVerified(message.author.id):
+                # function to fetch an invite to the user, IF IT EXISTS!
+                async def fetchInvite(user):
+                    inviteChannel = User.get_invite_channel(user.id)
+                    if inviteChannel == "":
+                        return ""
+                    try:
+                        channel = bot.get_channel(int(inviteChannel))
+                        if channel == None:
+                            await logger.log("Channel not found! ChannelID: " + inviteChannel, bot, "WARNING")
+                        invite = await channel.create_invite(max_uses=1, max_age=3600, reason="noDoot - Instant Invite for " + user.name + ". Expires in 1 hour, single use.")
+                        return " You can join back to the guild you wanted to join using this link: <" + invite.url + ">!"
+                    except Exception as e:
+                        await logger.log("Could not generate an invite to the user ( " + user.name + " `" + str(user.id) + "`)! - " + str(e), bot, "DEBUG")
+                        return ""
 
-            # check the captcha
-            captcha_text = User.get_captcha(message.author.id)
+                # check the captcha
+                captcha_text = User.get_captcha(message.author.id)
 
-            await logger.log("User: " + message.author.name + " `" + str(message.author.id) + "` - Captcha Text: " + captcha_text + " - Message content: " + message.content, bot, "DEBUG")
+                await logger.log("User: " + message.author.name + " `" + str(message.author.id) + "` - Captcha Text: " + captcha_text + " - Message content: " + message.content, bot, "DEBUG")
 
-            # if the message content is equals to that of the message
-            if message.content == captcha_text:
-                # If the user is already verified, do nothing
-                if User.isUserVerified(message.author.id):
-                    await logger.log("User tried to do captcha again, but are already verified! User: " + message.author.name, bot, "DEBUG")
+                # if the message content is equals to that of the message
+                if message.content == captcha_text:
+                    # If the user is already verified, do nothing
+                    if User.isUserVerified(message.author.id):
+                        await logger.log("User tried to do captcha again, but are already verified! User: " + message.author.name, bot, "DEBUG")
+                        return
+                    # if not, add them to the verified db
+                    User.verify_user(message.author.id)
+                    # Send completion message
+                    await logger.log("User completed captcha sucessfully! Added to verified users! User: " + message.author.name + " `" + str(message.author.id) + "`", bot, "INFO")
+                    invite_message = await fetchInvite(message.author)
+                    await message.channel.send(content="**Captcha completed successfully!**\nYour account is now verified!" + invite_message)
+
+                    # Kick from the noDoot Server
+                    try:
+                        await bot.get_guild(int(os.getenv('guild'))).kick(message.author, reason="noDoot - User verified sucessfully!")
+                    except Exception as e:
+                        await logger.log("Not enough permissions to kick user from the noDoot Verification Guild! User: " + message.author.name + " (`" + str(message.author.id) + "`) - " + str(e), bot, "DEBUG")
                     return
-                # if not, add them to the verified db
-                User.verify_user(message.author.id)
-                # Send completion message
-                await logger.log("User completed captcha sucessfully! Added to verified users! User: " + message.author.name + " `" + str(message.author.id) + "`", bot, "INFO")
-                invite_message = await fetchInvite(message.author)
-                await message.channel.send(content="**Captcha completed successfully!**\nYour account is now verified!" + invite_message)
-
-                # Kick from the noDoot Server
-                try:
-                    await bot.get_guild(int(os.getenv('guild'))).kick(message.author, reason="noDoot - User verified sucessfully!")
-                except Exception as e:
-                    await logger.log("Not enough permissions to kick user from the noDoot Verification Guild! User: " + message.author.name + " (`" + str(message.author.id) + "`) - " + str(e), bot, "DEBUG")
-                return
-            # if not
-            await message.channel.send(content="**Incorrect answer! Try again...**\n*If the captcha won't work, contact HeroGamers#0001 (listed as noDoot Developer on the noDoot Verification Server)!*")
+                # if not
+                await message.channel.send(content="**Incorrect answer! Try again...**\n*If the captcha won't work, contact HeroGamers#0001 (listed as noDoot Developer on the noDoot Verification Server)!*")
 
 def setup(bot):
     bot.add_cog(listenerCog(bot))

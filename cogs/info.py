@@ -36,7 +36,7 @@ class info(commands.Cog, name="Information"):
     async def _source(self, ctx):
         """Sends a link to the bot's GitHub page"""
         await logger.logCommand("Source Code", ctx)
-        await ctx.send("More sauce, please! Oh, you asked for the source? Well, did you know that noDoot is an Open Sourced bot, and that means that yo~ ..oh, you just wanted the link..? W-w-well here you go, you can view my code at:\n" +
+        await ctx.send("More sauce, please! Oh, you asked for the source? Well, did you know that noDoot is an Open Sourced bot, and that means that yo~ ..oh, you just wanted the link..? W-w-well here you go, you can view my code, and even write changes to it, at this GitHub repository:\n" +
             "https://github.com/Fido2603/noDoot")
 
 def setup(bot):

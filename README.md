@@ -9,9 +9,9 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/Fido2603/noDoot/master/LICENSE)
 </div>
 
-noDoot is a Discord bot developed by HeroGamers#0001, which denies Userbots from joining your guild, effictively stopping all DM and server spam from those bots that have been quite active on Discord lately.
+noDoot is a Discord bot developed by HeroGamers#0001, which denies Userbots from joining your guild, effictively stopping all DM and server spam from those bots that have been quite active on Discord lately. The bot currently runs on +10 guild, with a total unique user count of +1000 users.
 
-noDoot is developed as a submission for Discord's Hack Week 2019, in the moderation category. Therefore, I will not be taking any PR's until the Hack Week is over.
+noDoot was originally developed as a submission for Discord's Hack Week 2019, in the moderation category, and is not run as a hobby project. PR's are always welcome.
 
 ___
 
@@ -31,18 +31,20 @@ On the noDoot Verification Server, the user is sent a Captcha through their DM's
 -   [x] Global Verification - A one-time verification across all servers using noDoot
 
 ### Commands
-| Category           | Command       | Aliases                           | Description                                     | Who can use | Usage                              |
-|--------------------|---------------|-----------------------------------|-------------------------------------------------|-------------|------------------------------------|
-| Bot Administration | ~adduser      | ~au                               | Adds a user to the database                     | Bot Owner   | ~adduser <User ID or Mention>      |
-| Bot Administration | ~removeuser   | ~ru                               | Removes a user from the database                | Bot Owner   | ~removeuser <User ID or Mention>   |
-| Bot Administration | ~verifyuser   | ~vu, ~vuser, ~verify              | Verifies a user manually                        | Bot Owner   | ~verifyuser <User ID or Mention>   |
-| Bot Administration | ~unverifyuser | ~uvu, ~removeverify, ~unverify    | Removes the verification from a user            | Bot Owner   | ~unverifyuser <User ID or Mention> |
-| Bot Administration | ~getcaptcha   | ~gc, ~captcha                     | Gets a user's current captcha                   | Bot Owner   | ~getcaptcha <User ID or Mention>   |
-| Bot Administration | ~stop         | ~restart, ~shutdown               | Stops the bot's script                          | Bot Owner   | ~stop                              |
-| Information        | ~botinfo      | ~info                             | Gets information about the bot                  | Everyone    | ~botinfo                           |
-| Information        | ~invite       | ~inv, ~botinvite, ~botinv         | Sends OAuth 2 links to add the bot              | Everyone    | ~invite                            |
-| Information        | ~feedback     | ~support                          | Leave feedback or get support regarding the bot | Everyone    | ~feedback                          |
-| Information        | ~source       | ~sourcecode, ~github, ~git        | Sends a link to the bot's GitHub page           | Everyone    | ~source                            |
+| Category           | Command       | Aliases                            | Description                                     | Who can use | Usage                              |
+|--------------------|---------------|------------------------------------|-------------------------------------------------|-------------|------------------------------------|
+| Bot Administration | ~adduser      | ~au                                | Adds a user to the database                     | Bot Owner   | ~adduser <User ID or Mention>      |
+| Bot Administration | ~removeuser   | ~ru                                | Removes a user from the database                | Bot Owner   | ~removeuser <User ID or Mention>   |
+| Bot Administration | ~verifyuser   | ~vu, ~vuser, ~verify               | Verifies a user manually                        | Bot Owner   | ~verifyuser <User ID or Mention>   |
+| Bot Administration | ~unverifyuser | ~uvu, ~removeverify, ~unverify     | Removes the verification from a user            | Bot Owner   | ~unverifyuser <User ID or Mention> |
+| Bot Administration | ~getcaptcha   | ~gc, ~captcha                      | Gets a user's current captcha                   | Bot Owner   | ~getcaptcha <User ID or Mention>   |
+| Bot Administration | ~fcaptcha     | ~generatecaptcha, ~forcenewcaptcha | Generates a new captcha for a user              | Bot Owner   | ~fcaptcha <User ID or Mention>     |
+| Bot Administration | ~stop         | ~restart, ~shutdown                | Stops the bot's script                          | Bot Owner   | ~stop                              |
+| User Interaction   | ~newcaptcha   | ~new, ~nc, ~ncaptcha               | [DM Only] Gets a new captcha for the user       | Everyone    | ~newcaptcha                        |
+| Information        | ~botinfo      | ~info                              | Gets information about the bot                  | Everyone    | ~botinfo                           |
+| Information        | ~invite       | ~inv, ~botinvite, ~botinv          | Sends OAuth 2 links to add the bot              | Everyone    | ~invite                            |
+| Information        | ~feedback     | ~support                           | Leave feedback or get support regarding the bot | Everyone    | ~feedback                          |
+| Information        | ~source       | ~sourcecode, ~github, ~git         | Sends a link to the bot's GitHub page           | Everyone    | ~source                            |
 
 ## How to get rid of UserDoots
 **WARNING BEFORE ADDING THE BOT:** ***Adding this bot to your server definitely helps with keeping the userbots away for your server, but for smaller servers it may also cause less members to actually join the server, as they would see it as a hassle to complete the verification process!***

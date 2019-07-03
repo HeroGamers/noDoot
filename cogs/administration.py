@@ -1,6 +1,7 @@
 import User, os, datetime
+from discord import File
 from discord.ext import tasks, commands
-from utilities import logger
+from utilities import logger, captchaHandler
 
 class administration(commands.Cog, name="Bot Administration"):
     def __init__(self, bot):
@@ -64,6 +65,53 @@ class administration(commands.Cog, name="Bot Administration"):
         captcha = User.get_captcha(userid)
         await logger.logCommand("Get Captcha", ctx)
         await ctx.send(content="✅ Sucessfully made the query! Captcha: `" + captcha + "`")
+
+    # this part uses some code from userInteraction, so check there for comments
+    @commands.command(name="fcaptcha", aliases=["forcenewcaptcha", "generatecaptcha"])
+    @commands.is_owner()
+    async def _fcaptcha(self, ctx, arg):
+        """Generates a new captcha for a user"""
+        await logger.logCommand("Force New Captcha", ctx)
+        bot = self.bot
+        userid = self.getuserid(arg)
+        users = bot.get_guild(int(os.getenv('guild'))).members
+        user = None
+        for member in users:
+            if member.id == int(userid):
+                user = member
+                break
+
+        if user == None:
+            await logger.log("Could not generate new captcha for the user, " + userid + ". User not found.", bot, "ERROR")
+            return
+
+        # generate a captcha
+        captcha = captchaHandler.generateCaptcha()
+
+        # Put the captcha into the db
+        User.add_captcha(user.id, captcha[1])
+        await logger.log("Added captcha for user: " + user.name + " (" + str(user.id) + ") to the db. Captcha_text: " + captcha[1], bot, "INFO")
+
+        # send the message
+        dm_channel = user.dm_channel
+        if dm_channel == None:
+            await user.create_dm()
+            dm_channel = user.dm_channel
+
+        appinfo = await bot.application_info()
+        try:
+            await dm_channel.send(content="A new captcha has been generated to you (the captcha may consist of **lowercase letters** and **numbers**)!\n\n" +
+                "*If the captcha is not working, write `" + os.getenv('prefix') + "newcaptcha`, to generate a new captcha, or if you are stuck, then contact " + appinfo.owner.mention + " in the noDoot Verification Server through DM's!*", file=File(captcha[0]))
+        except Exception as e:
+            await logger.log("Could not send verification to user " + str(user.id) + " - " + str(e), bot, "INFO")
+            # Delete the captcha from the filesystem
+            os.remove(captcha[0])
+            await ctx.send(content="❎ Could not send the captcha to the user!")
+            return
+        await logger.log("Verification sent to user: " + str(user.id), bot, "DEBUG")
+        # Delete the captcha from the filesystem
+        os.remove(captcha[0])
+        await ctx.send(content="✅ Sent a new captcha to the user!")
 
     @commands.command(name="stop", aliases=["restart", "shutdown"])
     @commands.is_owner()

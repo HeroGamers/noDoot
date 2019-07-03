@@ -9,7 +9,7 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/Fido2603/noDoot/master/LICENSE)
 </div>
 
-noDoot is a Discord bot developed by HeroGamers#0001, which denies Userbots from joining your guild, effictively stopping all DM and server spam from those bots that have been quite active on Discord lately. The bot currently runs on +10 guild, with a total unique user count of +1000 users.
+noDoot is a Discord bot developed by HeroGamers#0001, which denies Userbots from joining your guild, effictively stopping all DM and server spam from those bots that have been quite active on Discord lately. The bot currently runs on +10 guilds, with a total unique user count of +1000 users.
 
 noDoot was originally developed as a submission for Discord's Hack Week 2019, in the moderation category, and is now run as a hobby project. PR's are always welcome!
 

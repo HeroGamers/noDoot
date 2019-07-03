@@ -83,7 +83,7 @@ class listenerCog(commands.Cog):
                 try:
                     await member.kick(reason="noDoot - User needs to be verified.. couldn't send DM to user. Reminded on the server")
                 except Exception as e:
-                    await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "DEBUG")
+                    await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "ERROR")
                     return
                 await logger.log("Kicked a user from joining a guild, not verified. Couldn't send DM. Reminded on the server. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "INFO")
 
@@ -161,9 +161,9 @@ class listenerCog(commands.Cog):
         try:
             await member.kick(reason="noDoot - User needs to be verified..")
         except Exception as e:
-            await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "DEBUG")
+            await logger.log("Could not kick the user from the guild. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name + " - Error: " + str(e), bot, "ERROR")
             return
-        await logger.log("Kicked a user from joining a guild, not verified. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "DEBUG")
+        await logger.log("Kicked a user from joining a guild, not verified. User: " + member.name + " `" + str(member.id) + "` - Guild: " + member.guild.name, bot, "INFO")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):

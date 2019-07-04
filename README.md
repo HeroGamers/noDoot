@@ -37,6 +37,7 @@ On the noDoot Verification Server, the user is sent a Captcha through their DM's
 | Bot Administration | ~removeuser   | ~ru                                | Removes a user from the database                | Bot Owner   | ~removeuser <User ID or Mention>   |
 | Bot Administration | ~verifyuser   | ~vu, ~vuser, ~verify               | Verifies a user manually                        | Bot Owner   | ~verifyuser <User ID or Mention>   |
 | Bot Administration | ~unverifyuser | ~uvu, ~removeverify, ~unverify     | Removes the verification from a user            | Bot Owner   | ~unverifyuser <User ID or Mention> |
+| Bot Administration | ~isverified   | ~iv, ~isuserverified               | Returns whether a user is verified              | Bot Owner   | ~isverified <User ID or Mention>   |
 | Bot Administration | ~getcaptcha   | ~gc, ~captcha                      | Gets a user's current captcha                   | Bot Owner   | ~getcaptcha <User ID or Mention>   |
 | Bot Administration | ~fcaptcha     | ~generatecaptcha, ~forcenewcaptcha | Generates a new captcha for a user              | Bot Owner   | ~fcaptcha <User ID or Mention>     |
 | Bot Administration | ~stop         | ~restart, ~shutdown                | Stops the bot's script                          | Bot Owner   | ~stop                              |

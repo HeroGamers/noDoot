@@ -56,6 +56,19 @@ class administration(commands.Cog, name="Bot Administration"):
         await logger.logCommand("Unverify User", ctx)
         await ctx.send(content="✅ Sucessfully made the query!")
 
+    @commands.command(name="isverified", aliases=["iv", "isuserverified"])
+    @commands.is_owner()
+    async def _isverified(self, ctx, arg):
+        """Returns whether a user is verified"""
+        userid = self.getuserid(arg)
+        # unverifies the user
+        verified = User.isUserVerified(userid)
+        isVerified = "The user is Not Verified!"
+        if verified == True:
+            isVerified = "The user is Verfied!"
+        await logger.logCommand("Is User Verified", ctx)
+        await ctx.send(content="✅ Sucessfully made the query! " + isVerified)
+
     @commands.command(name="getcaptcha", aliases=["gc", "captcha"])
     @commands.is_owner()
     async def _getcaptcha(self, ctx, arg):

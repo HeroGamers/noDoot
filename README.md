@@ -40,7 +40,7 @@ On the noDoot Verification Server, the user is sent a Captcha through their DM's
 | Bot Administration | ~getcaptcha   | ~gc, ~captcha                      | Gets a user's current captcha                   | Bot Owner   | ~getcaptcha <User ID or Mention>   |
 | Bot Administration | ~fcaptcha     | ~generatecaptcha, ~forcenewcaptcha | Generates a new captcha for a user              | Bot Owner   | ~fcaptcha <User ID or Mention>     |
 | Bot Administration | ~stop         | ~restart, ~shutdown                | Stops the bot's script                          | Bot Owner   | ~stop                              |
-| User Interaction   | ~newcaptcha   | ~new, ~nc, ~ncaptcha               | [DM Only] Gets a new captcha for the user       | Everyone    | ~newcaptcha                        |
+| User Interaction   | ~newcaptcha   | ~new, ~nc, ~ncaptcha               | DM's Only - Gets a new captcha for the user     | Everyone    | ~newcaptcha                        |
 | Information        | ~botinfo      | ~info                              | Gets information about the bot                  | Everyone    | ~botinfo                           |
 | Information        | ~invite       | ~inv, ~botinvite, ~botinv          | Sends OAuth 2 links to add the bot              | Everyone    | ~invite                            |
 | Information        | ~feedback     | ~support                           | Leave feedback or get support regarding the bot | Everyone    | ~feedback                          |

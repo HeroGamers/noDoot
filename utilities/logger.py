@@ -1,4 +1,4 @@
-import os, sys, logging, datetime
+import os, sys, logging, datetime, discord
 from logging.handlers import TimedRotatingFileHandler
 
 def setup_logger():
@@ -61,4 +61,7 @@ def logDebug(message, level="INFO"):
         logger.info(message)
 
 async def logCommand(commandName, ctx, level="INFO"):
-    await log(ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command, in the channel #" + ctx.channel.name + " (`" + str(ctx.channel.id) + "`), in the guild " + ctx.guild.name + " (`" + str(ctx.guild.id) + "`)", ctx.bot, level)
+    if isinstance(ctx.message.channel, discord.DMChannel):
+        await log(ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command", ctx.bot, level)
+    else:
+        await log(ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command, in the channel #" + ctx.channel.name + " (`" + str(ctx.channel.id) + "`), in the guild " + ctx.guild.name + " (`" + str(ctx.guild.id) + "`)", ctx.bot, level)

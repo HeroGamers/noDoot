@@ -1,4 +1,4 @@
-import discord, User, os
+import User, os
 from discord import File
 from discord.ext import commands
 from utilities import logger, captchaHandler

@@ -2,7 +2,6 @@ import discord, asyncio, User
 from discord import File
 from discord.ext import commands
 from utilities import logger, captchaHandler
-from captcha.image import ImageCaptcha
 import os
 
 class listenerCog(commands.Cog):
@@ -232,6 +231,8 @@ class listenerCog(commands.Cog):
             await logger.log("New message in the DM's", bot, "DEBUG")
 
             if not User.isUserVerified(message.author.id):
+                if message.content.startswith(os.getenv('prefix')):
+                    return
                 # function to fetch an invite to the user, IF IT EXISTS!
                 async def fetchInvite(user):
                     inviteChannel = User.get_invite_channel(user.id)

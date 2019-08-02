@@ -11,7 +11,7 @@ class administration(commands.Cog, name="Bot Administration"):
     @classmethod
     def getuserid(cls, arg):
         if arg.startswith("<@") and arg.endswith(">"):
-            return arg.replace("<@", "").replace(">", "")
+            return arg.replace("<@", "").replace(">", "").replace("!", "") # fuck you nicknames
         else:
             return arg
 
@@ -63,12 +63,12 @@ class administration(commands.Cog, name="Bot Administration"):
     @commands.is_owner()
     async def _isverified(self, ctx, arg):
         """Returns whether a user is verified"""
-        await logger.log("arg: " + str(arg), ctx.bot)
+        await logger.log("arg: " + str(arg), ctx.bot, "DEBUG")
         userid = self.getuserid(arg)
-        await logger.log("userid: " + str(userid), ctx.bot)
+        await logger.log("userid: " + str(userid), ctx.bot, "DEBUG")
         # checks the user the user
         verified = User.isUserVerified(userid)
-        await logger.log("verified: " + str(verified), ctx.bot)
+        await logger.log("verified: " + str(verified), ctx.bot, "DEBUG")
         isVerified = "The user is Not Verified!"
         if verified == True:
             isVerified = "The user is Verfied!"

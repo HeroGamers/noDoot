@@ -41,6 +41,9 @@ class administration(commands.Cog, name="Bot Administration"):
     async def _verifyuser(self, ctx, arg):
         """Verifies a user manually"""
         userid = self.getuserid(arg)
+        user = await ctx.bot.fetch_user(userid)
+        # adds the user to the database, if not already existing
+        await User.add_user(userid, user.name + "#" + user.discriminator, ctx.bot)
         # verifies the user
         User.verify_user(userid)
         await logger.logCommand("Verify User", ctx)
@@ -61,7 +64,7 @@ class administration(commands.Cog, name="Bot Administration"):
     async def _isverified(self, ctx, arg):
         """Returns whether a user is verified"""
         userid = self.getuserid(arg)
-        # unverifies the user
+        # checks the user the user
         verified = User.isUserVerified(userid)
         isVerified = "The user is Not Verified!"
         if verified == True:

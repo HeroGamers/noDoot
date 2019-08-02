@@ -26,7 +26,7 @@ def remove_user(userid):
     query.execute()
 
 def isUserVerified(userid):
-    query = User.select().where((User.UserID == userid) & (User.Verified == True))
+    query = User.select().where((User.UserID.contains(str(userid))) & (User.Verified == True))
     if query.exists():
         return True
     return False

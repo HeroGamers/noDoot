@@ -63,9 +63,12 @@ class administration(commands.Cog, name="Bot Administration"):
     @commands.is_owner()
     async def _isverified(self, ctx, arg):
         """Returns whether a user is verified"""
+        await logger.log("arg: " + str(arg), ctx.bot)
         userid = self.getuserid(arg)
+        await logger.log("userid: " + str(userid), ctx.bot)
         # checks the user the user
         verified = User.isUserVerified(userid)
+        await logger.log("verified: " + str(verified), ctx.bot)
         isVerified = "The user is Not Verified!"
         if verified == True:
             isVerified = "The user is Verfied!"

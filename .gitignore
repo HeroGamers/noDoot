@@ -3,6 +3,9 @@ config.py
 logs/
 img/psd_files
 verifiedUsers.db
+.idea/
+monkeyPatch.py
+config-alt.py
 
 # VSCode
 .vscode/

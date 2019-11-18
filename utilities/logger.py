@@ -1,6 +1,7 @@
 import os, sys, logging, datetime, discord
 from logging.handlers import TimedRotatingFileHandler
 
+
 def setup_logger():
     if not os.path.exists("logs"):
         os.makedirs("logs")
@@ -16,8 +17,9 @@ def setup_logger():
 
     logger = logging.getLogger("noDoot")
     logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG) # CAN BE CHANGED TO "logging.DEBUG", when run locally to enable debugging!
+    logger.setLevel(logging.DEBUG)  # CAN BE CHANGED TO "logging.DEBUG", when run locally to enable debugging!
     logger.addHandler(screen_handler)
+
 
 async def log(message, bot, level="INFO", debug=""):
     # Return if the logging level is not DEBUG, and the bot is trying to log some debugging stuff
@@ -46,6 +48,7 @@ async def log(message, bot, level="INFO", debug=""):
         return
     logDebug(debug, level)
 
+
 def logDebug(message, level="INFO"):
     logger = logging.getLogger("noDoot")
 
@@ -60,8 +63,13 @@ def logDebug(message, level="INFO"):
     else:
         logger.info(message)
 
+
 async def logCommand(commandName, ctx, level="INFO"):
     if isinstance(ctx.message.channel, discord.DMChannel):
-        await log(ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command", ctx.bot, level)
+        await log(ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command",
+                  ctx.bot, level)
     else:
-        await log(ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command, in the channel #" + ctx.channel.name + " (`" + str(ctx.channel.id) + "`), in the guild " + ctx.guild.name + " (`" + str(ctx.guild.id) + "`)", ctx.bot, level)
+        await log(
+            ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command, in the channel #" + ctx.channel.name + " (`" + str(
+                ctx.channel.id) + "`), in the guild " + ctx.guild.name + " (`" + str(ctx.guild.id) + "`)", ctx.bot,
+            level)

@@ -58,8 +58,6 @@ async def on_ready():
     logger.logDebug("--------------------------------------", "INFO")
     await logger.log("Bot startup done.", bot, "INFO", "Bot startup done.\n")
 
-    await appInfo()
-
 
 @bot.event
 async def on_guild_join(guild):
